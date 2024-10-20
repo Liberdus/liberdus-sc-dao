@@ -1,0 +1,30 @@
+
+.container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-family: 'Lato', serif;
+  background-color: var(--background-color);
+  color: var(--primary-text-color);
+}
+
+.banner{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background-color);
+  color: var(--primary-text-color);
+}
+
+.banner > * {
+  padding: 1rem;
+}
+
+.description{
+  font-family: 'Merriweather', serif;
+  color: var(--secondary-text-color);
+}
+
