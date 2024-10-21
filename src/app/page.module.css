@@ -1,26 +1,28 @@
-
-.container{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  font-family: 'Lato', serif;
-  background-color: var(--background-color);
-  color: var(--primary-text-color);
-}
-
 .banner{
+  width:100vw;
+  height:100vh;
+  background-color: var(--background-color);
+  color: var(--primary-text-color);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: var(--background-color);
-  color: var(--primary-text-color);
 }
 
-.banner > * {
+.banner > div {
+  max-width: 80vw;
+  max-height: 80vh;
+  padding: 2rem;
+  border:2px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner > div > *{
   padding: 1rem;
+  text-align: center;
 }
 
 .description{

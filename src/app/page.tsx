@@ -1,5 +1,4 @@
 "use client"
-import Image from "next/image";
 import styles from "./page.module.css";
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -20,28 +19,24 @@ import {
   QueryClientProvider,
   QueryClient,
 } from "@tanstack/react-query";
-
-const config = getDefaultConfig({
-  appName: 'Liberdus Bridging And Governance',
-  projectId: 'a456240005ff39a4d2dc51d18ffa4ad9',
-  chains: [mainnet, polygon, optimism, arbitrum, base],
-  ssr: true, // If your dApp uses server side rendering (SSR)
-});
-
+import { wagmiConfig } from "./wagmi";
+import { useEffect } from "react";
+import { redirect } from "next/navigation";
 
 const queryClient = new QueryClient();
 
 export default function Home() {
 
-  const { address, isConnected } = useAccount({config});
+  const { address, isConnected } = useAccount({config: wagmiConfig});
+
+  // redirect('/debug');
 
   return (
-    <WagmiProvider config={config}>
+    <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
-          <div className={styles.container}>
-            {!isConnected && <Banner />}
-          </div>
+            {!isConnected ? <WalletConnect /> : 
+              <>Development in process</>}
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
@@ -49,12 +44,14 @@ export default function Home() {
   );
 }
 
-function Banner() {
+function WalletConnect() {
   return (
     <div className={styles.banner}>
-      <h1 className={styles.title}>Liberdus Smart Contract Bridging And Governance</h1>
-      <div className={styles.description}>Start Connecting your wallet to do bridge operations with liberdus network</div>
-      <ConnectButton/>
+      <div>
+        <h1 className={styles.title}>Liberdus Smart Contract Bridging And Governance</h1>
+        <div className={styles.description}>Start Connecting your wallet to do bridge operations with liberdus network</div>
+        <ConnectButton/>
+      </div>
     </div>
   );
 }

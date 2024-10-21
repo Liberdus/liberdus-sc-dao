@@ -9,11 +9,13 @@
   --heading-color: #d4a017;            /* Golden yellow for headings */
   --background-color: #fffde7;         /* Light yellow paper-like background */
   --secondary-text-color: #555555;     /* Lighter gray for secondary text */
-  --border-color: #dcdcdc;             /* Light gray for borders/lines */
   --code-background-color: #f4f4f4;    /* Light gray for code snippets */
   --code-text-color: #333333;          /* Dark text for code */
   --button-background-color: #d4a017;  /* Button background (golden yellow) */
-  --button-text-color: #ffffff;        /* Button text white */}
+  --button-text-color: #ffffff;        /* Button text white */
+  /* --border-color: #fffde7; */
+}
+
 
 @media (prefers-color-scheme: dark) {
   :root {
