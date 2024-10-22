@@ -1,19 +1,22 @@
 import { useAccount, useConnect, useContractWrite, useDisconnect } from "wagmi";
 import styles from "./page.module.css";
 import { contractAddress, wagmiConfig } from "../wagmi";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { injected } from "wagmi/connectors";
 import { abi } from "../../../abi.json";
 import { toast } from "react-toastify";
+import { operationEnumToString } from "../utils";
 
 export default function NavWrapper({ children }) {
   const { address, isConnected } = useAccount({config: wagmiConfig});
   const { disconnect } = useDisconnect();
   const [ isModal, setIsModal ] = useState(false);
+  const navBarRef = useRef<any>(null);
+  
 
   return (
     <div className={styles.navWrapper}>
-      <div className={styles.navbar}>
+      <div className={styles.navbar} ref={navBarRef}>
         <div className={styles.navLeft}><h2>Liberdus Smart Contract Governance</h2></div>
         <div className={styles.navRight}>
           <div className={styles.proposal} onClick={()=>{setIsModal(true)}}>Propose</div>
@@ -21,14 +24,18 @@ export default function NavWrapper({ children }) {
           <div className={styles.disconnectBtn} onClick={(e)=>{disconnect()}}>Disconnect</div>
         </div>
       </div>
-      <div className={styles.body}>
+      <div className={styles.navInner}>
+        <div style={{height: navBarRef?.current?.offsetHeight}}></div>
         { isModal && <ProposalModal setIsModal={setIsModal}/> }
+        { children }
       </div>
     </div>)
 }
 
 
+
 function ProposalModal({ setIsModal }) {
+  const modalRef = useRef<any>(null);
   const [ operation, setOperation ] = useState<number | null>(null);
   const [ target, setTarget ] = useState("");
   const [ scValue, setScValue ] = useState(0);
@@ -37,53 +44,52 @@ function ProposalModal({ setIsModal }) {
   const { writeContractAsync, writeContract } = useContractWrite({config: wagmiConfig});
   const { address, isConnected } = useAccount({config: wagmiConfig});
 
-  const operationEnumToString = (op: number | null) => {
-    switch(op){
-      case 0:
-        return "Mint";
-      case 1:
-        return "Burn";
-      case 2:
-        return "PostLaunch";
-      case 3:
-        return "Pause";
-      case 4:
-        return "Unpause";
-      case 5:
-        return "SetBridgeInCaller";
-      case 6:
-        return "SetBridgeInLimits";
-      case 7:
-        return "UpdateSigner";
-      default:
-        return "Select Operation";
-    }
-  }
-
   const scRequestOperation = async () => {
 
       if(!isConnected){
         connect({ connector: injected() })
       }
       
-      const opId = await writeContractAsync({
-        address: contractAddress,
-        abi: abi,
-        functionName: "requestOperation",
-        args: [operation, target, scValue, data],
-      })
+      let opId = null
+      try{
+         opId = await writeContractAsync({
+          address: contractAddress,
+          abi: abi,
+          functionName: "requestOperation",
+          args: [operation, target, scValue, data],
+        })
+      }catch(e: any){
+        toast(e.message);
+      }
       
       if(opId){
         toast(`Operation ID: ${opId}`);
+      }
+      else{
+        toast("Failed to request operation");
       }
       
       return opId;
 
   }
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        setIsModal(false);  // Close modal if user clicks outside the modal content
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setIsModal]);
+
   return (
     <div className={styles.modal}>
-      <div className={styles.modalContent}>
+      <div className={styles.modalContent} ref={modalRef}>
          <div className={styles.dropdown}>
             <button className={styles.dropdownButton}>{ operationEnumToString(operation) }</button>
             <div className={styles.dropdownContent}>

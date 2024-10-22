@@ -10,6 +10,7 @@ import WalletConnect from "../walletConnect.component";
 import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import NavWrapper from "./navWrapper.component";
+import OpIdExplorer from './opIdExplorer.component';
 
 const queryClient = new QueryClient();
 
@@ -25,7 +26,7 @@ export default function DaoPage(){
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
-            {!stateFulIsConnected ? <WalletConnect /> : <NavWrapper><></></NavWrapper>}
+            {!stateFulIsConnected ? <WalletConnect /> : <NavWrapper><OpIdExplorer/></NavWrapper>}
             <ToastContainer position='bottom-right'/>
         </RainbowKitProvider>
       </QueryClientProvider>
