@@ -61,24 +61,23 @@ function ProposalModal({ setIsModal }) {
   }
 
   const scRequestOperation = async () => {
-    toast("Requesting Operation");
 
-      // if(!isConnected){
-      //   connect({ connector: injected() })
-      // }
-      //
-      // const opId = await writeContractAsync({
-      //   address: contractAddress,
-      //   abi: abi,
-      //   functionName: "requestOperation",
-      //   args: [operation, target, scValue, data],
-      // })
-      //
-      // if(opId){
-      //   toast(`Operation ID: ${opId}`);
-      // }
-      //
-      // return opId;
+      if(!isConnected){
+        connect({ connector: injected() })
+      }
+      
+      const opId = await writeContractAsync({
+        address: contractAddress,
+        abi: abi,
+        functionName: "requestOperation",
+        args: [operation, target, scValue, data],
+      })
+      
+      if(opId){
+        toast(`Operation ID: ${opId}`);
+      }
+      
+      return opId;
 
   }
 

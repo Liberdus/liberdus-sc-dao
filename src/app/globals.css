@@ -48,12 +48,7 @@
 
   --toastify-color-progress-light: linear-gradient(
     to right,
-    #4cd964,
-    #5ac8fa,
-    #007aff,
-    #34aadc,
-    #5856d6,
-    #ff2d55
+    #0e9aa7,
   );
   --toastify-color-progress-dark: #bb86fc;
   --toastify-color-progress-info: var(--toastify-color-info);
