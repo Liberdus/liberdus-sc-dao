@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './page.module.css'
 import { ethers } from 'ethers'
 import { contractAddress } from '../wagmi'; // update path
 import { abi } from '../../../abi.json';
 import { toast } from 'react-toastify';
 import {operationEnumToString} from '../utils';
+import { BrowserProvider } from 'ethers';
 
 export default function OpIdExplorer() {
   const [events, setEvents] = useState<(ethers.Log | ethers.EventLog)[]>([]);
@@ -42,10 +43,9 @@ export default function OpIdExplorer() {
   return (
     <div className={styles.opIdExplorerContainer}>
       {(opModal) && <DetailedOpModal
-        isOpen={opModal}
         setIsOpen={setOpModal}
         opId={modalOpId}
-        provider={provider}
+        provider={provider as ethers.BrowserProvider}
       />}
       {
         events.map((event, index) => {
@@ -88,9 +88,10 @@ export default function OpIdExplorer() {
   );
 }
 
-function DetailedOpModal({ isOpen, setIsOpen, opId, provider }) {
+function DetailedOpModal({ setIsOpen, opId, provider }: {setIsOpen: any, opId: string, provider: ethers.BrowserProvider }) {
   const [opDetails, setOpDetails] = useState(null);
-  const [signer, setSigner] = useState(null);
+  const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
+  const modalRef = useRef(null);
 
   useEffect(() => {
     if (provider) {
@@ -116,6 +117,20 @@ function DetailedOpModal({ isOpen, setIsOpen, opId, provider }) {
       getOperationById(opId).then(setOpDetails);
     }
   }, [contract, opId]);
+    useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        setIsOpen(false);  // Close modal if user clicks outside the modal content
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setIsOpen]);
+
 
   const handleSign = async () => {
     try {
@@ -138,7 +153,7 @@ function DetailedOpModal({ isOpen, setIsOpen, opId, provider }) {
       });
 
       // Submit signature
-      const contractWithSigner = contract.connect(signer);
+      const contractWithSigner = contract.connect(signer) as any;
       const tx = await contractWithSigner.submitSignature(opId, signature);
 
       // Wait for transaction
@@ -154,8 +169,33 @@ function DetailedOpModal({ isOpen, setIsOpen, opId, provider }) {
 
   return (
     <div className={styles.detailedOpModalContainer}>
-      <div className={styles.detailedOpModalContent}>
+      <div className={styles.detailedOpModalContent} ref={modalRef}>
         {/* ... rest of your modal JSX ... */}
+        <h3>{opId}</h3>
+        <table className={styles.opTable}>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Target</th>
+              <th>Value</th>
+              <th>Data</th>
+              <th>Executed</th>
+              <th>SigCount</th>
+            </tr>
+          </thead>
+          { opDetails &&
+            <tbody>
+                <tr >
+                  <td>{BigInt(opDetails[0]).toString()}</td>
+                  <td>{opDetails[1]}</td>
+                  <td>{BigInt(opDetails[2]).toString()}</td>
+                  <td>{opDetails[3]}</td>
+                  <td>{opDetails[5] ? "true" : "false" }</td>
+                  <td>{BigInt(opDetails[4]).toString()}</td>
+                </tr>
+            </tbody>
+          }
+        </table>
         <div className={styles.detailedOpModalButtons}>
           <div onClick={handleSign}>Sign</div>
           <div onClick={() => setIsOpen(false)}>Close</div>
