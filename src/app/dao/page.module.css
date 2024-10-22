@@ -1,0 +1,160 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+  font-family: 'Lato', serif;
+  background-color: var(--background-color);
+  border-bottom: 3px solid black;
+}
+
+.navLeft {
+  margin-left: 1rem;
+}
+
+.navRight {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.navRight > div {
+  padding: 1rem;
+  border-left: 2px solid black;
+}
+
+.address {
+  color: var(--primary-text-color);
+  font-family: "Roboto Mono", serif;
+}
+
+.disconnectBtn  {
+  background-color: black;
+  color: white;
+}
+.disconnectBtn:hover {
+  background-color: red;
+  color: white;
+  cursor: pointer;
+}
+
+.proposal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Merriweather', serif;
+  color: var(--primary-text-color);
+  background-color: var(--background-color);
+  border: 2px solid black;
+  padding: 1rem;
+  margin: 1rem;
+}
+
+.proposal:hover{
+  background-color: var(--code-background-color);
+  cursor: pointer;
+}
+
+.modal {
+  z-index: 1;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modalContent{
+  max-width: 50%;
+  margin: auto;
+  padding: 1rem;
+  background-color: var(--background-color);
+  font-family: 'Merriweather', serif;
+  color: var(--primary-text-color);
+  border: 2px solid black;
+}
+
+.modalContent > div {
+  padding: 1rem;
+}
+
+.dropdown {
+  font-family: 'Lato', serif;
+  width:100%;
+  position: relative;
+  display: inline-block;
+}
+
+.dropdownButton {
+  background-color:black;
+  width: 100%;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.dropdownButton:hover {
+  background-color: #b59312;
+}
+
+.dropdownContent {
+  border: 2px solid black;
+  display: none;
+  position: absolute;
+  background-color: black;
+  width: 88%;
+  z-index: 1;
+}
+
+.dropdownContent a {
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdownContent a:hover {
+  background-color: var(--button-background-color);
+}
+
+.dropdown:hover .dropdownContent {
+  display: block;
+}
+
+.textForms > input {
+  all: unset; /* Resets most inherited and default styles */
+  appearance: none; /* Removes default styling on some browsers (like iOS) */
+  border: none; /* Removes any default borders */
+  background: none; /* Removes default background */
+  padding-bottom: 1rem; /* Removes default padding */
+  outline: none; /* Removes focus outline */
+  box-shadow: none; /* Removes box shadow */
+  font: inherit; /* Ensures the font style is inherited from parent */
+  color: inherit; /* Ensures text color is inherited */
+  border-bottom: 2px solid var(--primary-text-color);
+}
+.textForms > input::placeholder {
+  color: var(--secondary-text-color);
+}
+.modalButtons{
+  max-width: 100%;
+  /* margin: auto; */
+  padding: 1rem;
+  margin: 1rem;
+  background-color: var(--background-color);
+  font-family: 'Merriweather', serif;
+  color: var(--primary-text-color);
+  border: 2px solid black;
+}
+
+.modalButtons:hover{
+  background-color: var(--code-background-color);
+  cursor: pointer;
+}
