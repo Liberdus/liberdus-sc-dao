@@ -115,7 +115,7 @@
 
 .dropdownContent {
   border: 2px solid black;
-  display: none;
+  display: block;
   position: absolute;
   background-color: black;
   width: 88%;
@@ -133,9 +133,9 @@
   background-color: var(--button-background-color);
 }
 
-.dropdown:hover .dropdownContent {
-  display: block;
-}
+/* .dropdownButton:hover .dropdownContent { */
+/*   display: block; */
+/* } */
 
 .textForms > input {
   all: unset; /* Resets most inherited and default styles */

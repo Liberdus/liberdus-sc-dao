@@ -10,11 +10,11 @@ import { toast } from 'react-toastify';
 import {operationEnumToString} from '../utils';
 import { BrowserProvider } from 'ethers';
 
-export default function OpIdExplorer() {
-  const [events, setEvents] = useState<(ethers.Log | ethers.EventLog)[]>([]);
-  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
+export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.EventLog)[] }){
   const [opModal, setOpModal] = useState(false);
   const [modalOpId, setModalOpId] = useState<string>("");
+  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
+  const contract = provider ? new ethers.Contract(contractAddress, abi, provider) : null;
 
   useEffect(() => {
     if (window.ethereum) {
@@ -23,25 +23,6 @@ export default function OpIdExplorer() {
     }
   }, []);
 
-  const contract = provider ? new ethers.Contract(contractAddress, abi, provider) : null;
-
-  const queryAllEvents = async () => {
-    if (!contract) return;
-    try {
-      const filter = contract.filters.OperationRequested();
-      const allEvents = await contract.queryFilter(filter, 0, 'latest');
-      setEvents(allEvents);
-
-    } catch (error) {
-      console.error('Error querying events:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (contract) {
-      queryAllEvents();
-    }
-  }, [contract]);
 
   return (
     <div className={styles.opIdExplorerContainer}>

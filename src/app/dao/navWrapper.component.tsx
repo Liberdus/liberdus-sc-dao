@@ -7,11 +7,16 @@ import { abi } from "../../../abi.json";
 import { toast } from "react-toastify";
 import { operationEnumToString } from "../utils";
 
-export default function NavWrapper({ children }) {
+export default function NavWrapper({ children }: { children: React.ReactNode }) {
   const { address, isConnected } = useAccount({config: wagmiConfig});
   const { disconnect } = useDisconnect();
   const [ isModal, setIsModal ] = useState(false);
   const navBarRef = useRef<any>(null);
+  const [ offsetBody, setOffsetBody ] = useState(0);
+
+  useEffect(() => {
+    setOffsetBody(navBarRef?.current?.offsetHeight || 0);
+  }, [navBarRef]);
   
 
   return (
@@ -25,7 +30,7 @@ export default function NavWrapper({ children }) {
         </div>
       </div>
       <div className={styles.navInner}>
-        <div style={{height: navBarRef?.current?.offsetHeight}}></div>
+        <div style={{height: offsetBody}}></div>
         { isModal && <ProposalModal setIsModal={setIsModal}/> }
         { children }
       </div>
@@ -34,7 +39,7 @@ export default function NavWrapper({ children }) {
 
 
 
-function ProposalModal({ setIsModal }) {
+function ProposalModal({ setIsModal }: { setIsModal: (x: boolean)=>void }) {
   const modalRef = useRef<any>(null);
   const [ operation, setOperation ] = useState<number | null>(null);
   const [ target, setTarget ] = useState("");
@@ -87,21 +92,26 @@ function ProposalModal({ setIsModal }) {
     };
   }, [setIsModal]);
 
+  const [ shouldDropdown, setShouldDropdown ] = useState(false);
+
   return (
     <div className={styles.modal}>
       <div className={styles.modalContent} ref={modalRef}>
          <div className={styles.dropdown}>
-            <button className={styles.dropdownButton}>{ operationEnumToString(operation) }</button>
-            <div className={styles.dropdownContent}>
-              <a href="#" onClick={()=>{setOperation(0)}}>Mint</a>
-              <a href="#" onClick={()=>{setOperation(1)}}>Burn</a>
-              <a href="#" onClick={()=>{setOperation(2)}}>PostLaunch</a>
-              <a href="#" onClick={()=>{setOperation(3)}}>Pause</a>
-              <a href="#" onClick={()=>{setOperation(4)}}>Unpause</a>
-              <a href="#" onClick={()=>{setOperation(5)}}>SetBridgeInCaller</a>
-              <a href="#" onClick={()=>{setOperation(6)}}>SetBridgeInLimits</a>
-              <a href="#" onClick={()=>{setOperation(7)}}>UpdateSigner</a>
-            </div>
+            <button className={styles.dropdownButton} onClick={()=>{setShouldDropdown(true)}}>{ operationEnumToString(operation) }</button>
+            { shouldDropdown &&
+              <div className={styles.dropdownContent}>
+                <a href="#" onClick={()=>{setOperation(0); setShouldDropdown(false) }}>Mint</a>
+                <a href="#" onClick={()=>{setOperation(1); setShouldDropdown(false) }}>Burn</a>
+                <a href="#" onClick={()=>{setOperation(2); setShouldDropdown(false) }}>PostLaunch</a>
+                <a href="#" onClick={()=>{setOperation(3); setShouldDropdown(false) }}>Pause</a>
+                <a href="#" onClick={()=>{setOperation(4); setShouldDropdown(false) }}>Unpause</a>
+                <a href="#" onClick={()=>{setOperation(5); setShouldDropdown(false) }}>SetBridgeInCaller</a>
+                <a href="#" onClick={()=>{setOperation(6); setShouldDropdown(false) }}>SetBridgeInLimits</a>
+                <a href="#" onClick={()=>{setOperation(7); setShouldDropdown(false) }}>UpdateSigner</a>
+              </div>
+
+            }
         </div>
         <div className={styles.textForms}>
           <input type="text" name="target" id="target" placeholder="Target"
