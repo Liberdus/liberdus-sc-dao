@@ -30,7 +30,7 @@ export default function DaoPage(){
       const filter = contract.filters.OperationRequested();
       const allEvents = await contract.queryFilter(filter, 0, 'latest');
       allEvents.reverse();
-      setEvents(allEvents);
+      if(allEvents.length !== events.length) setEvents(allEvents);
 
     } catch (error) {
       console.error('Error querying events:', error);
