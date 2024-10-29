@@ -1,20 +1,12 @@
 "use client"
-
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useAccount, useDisconnect, useWatchContractEvent, WagmiProvider } from "wagmi";
+import { useAccount } from "wagmi";
 import { contractAddress, wagmiConfig } from "../wagmi";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import WalletConnect from "../walletConnect.component";
 import { useEffect, useState } from "react";
-import styles from "./page.module.css";
-import NavWrapper from "./navWrapper.component";
 import OpIdExplorer from './opIdExplorer.component';
 import { ethers } from 'ethers';
 import { abi } from '../../../abi.json';
 
-const queryClient = new QueryClient();
 
 export default function DaoPage(){
   const { address, isConnected } = useAccount({config: wagmiConfig});
@@ -23,14 +15,19 @@ export default function DaoPage(){
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const contract = provider ? new ethers.Contract(contractAddress, abi, provider) : null;
 
+  // [TODO] The current way slow down UI when there's too frequent new proposal
+  // A better way is to use websocket to listen to new proposal only.
   const queryAllEvents = async () => {
     if (!provider) return;
     if (!contract) return;
     try {
       const filter = contract.filters.OperationRequested();
       const allEvents = await contract.queryFilter(filter, 0, 'latest');
-      allEvents.reverse();
-      if(allEvents.length !== events.length) setEvents(allEvents);
+      if(allEvents.length !== events.length) {
+        allEvents.reverse();
+        setEvents(allEvents);
+      }
+
 
     } catch (error) {
       console.error('Error querying events:', error);
@@ -53,15 +50,7 @@ export default function DaoPage(){
 
 
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
-            {!stateFulIsConnected ? <WalletConnect /> : <NavWrapper><OpIdExplorer events={events}/></NavWrapper>}
-            <ToastContainer position='bottom-right'/>
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
-
+   <OpIdExplorer events={events}/>
   );
 }
 
