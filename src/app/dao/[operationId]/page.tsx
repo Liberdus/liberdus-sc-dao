@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styles from './page.module.css';
 import { ethers } from 'ethers';
-import { contractAddress, wagmiConfig } from '@/app/wagmi';
+import { contractAddress, OperationTypes,  OperationTypesMap, wagmiConfig } from '@/app/wagmi';
 import { abi } from '../../../../abi.json';
 import { operationEnumToString } from '@/app/utils';
 import { toast } from 'react-toastify';
@@ -57,6 +57,10 @@ export default function ProposalDetails({params}: { params: { operationId: strin
         proposedTimestamp: Date.now(),
         approvers: [],
         sigRequired: 3, 
+      }
+      if (basicOperationFacts[0] == OperationTypesMap[OperationTypes.UpdateSigner]) {
+        completeOperationFacts.sigRequired = 2
+        completeOperationFacts.value = ethers.getAddress(ethers.toBeHex(completeOperationFacts.value, 20));
       }
 
 
@@ -160,6 +164,19 @@ export default function ProposalDetails({params}: { params: { operationId: strin
     return <div>Loading...</div>
   }
 
+  function getDecodedData(operationFacts) {
+    console.log('operationFacts', operationFacts);
+    if (operationFacts.type === OperationTypesMap[OperationTypes.SetBridgeInLimits]) {
+      console.log('operationFacts.data', operationFacts.data);
+      const decodedData = ethers.AbiCoder.defaultAbiCoder().decode(
+        ['uint256'],
+        ethers.getBytes(operationFacts.data)
+      );
+      console.log('decodedData', decodedData.toString());
+      return decodedData.toString();
+    }
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.containerBody}>
@@ -177,7 +194,7 @@ export default function ProposalDetails({params}: { params: { operationId: strin
           <div className={styles.value}>{operationEnumToString(operationFacts.type)}</div>
           <div className={styles.value}>{operationFacts.target}</div>
           <div className={styles.value}>{operationFacts.value.toString()}</div>
-          <div className={styles.value}>{operationFacts.data}</div>
+          <div className={styles.value}>{getDecodedData(operationFacts)}</div>
           <div className={styles.value}>{operationFacts.signed.toString()}/{operationFacts.sigRequired.toString()}</div>
           <div className={styles.value}>{operationFacts.executed ? "True" : "False"}</div>
           <div className={styles.value}>{operationFacts.proposer}</div>

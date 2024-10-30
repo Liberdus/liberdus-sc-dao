@@ -1,4 +1,5 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
+import { zeroAddress } from "ethers";
 
 import {
   mainnet,
@@ -163,19 +164,19 @@ export const defaultLiberdusValues: {
   },
   SetBridgeInLimits: {
     target: {
+      default: ownerAddress,
+      allowed: false,
+      placeholder: "New bridge-in max amount"
+    },
+    value: {
       default: 10000,
       allowed: true,
       placeholder: "New bridge-in max amount"
     },
-    value: {
-      default: 60,
-      allowed: true,
-      placeholder: "New bridge-in cooldown (in seconds)"
-    },
     data: {
       default: "0x",
-      allowed: false,
-      placeholder: "Set bridge in limits data"
+      allowed: true,
+      placeholder: "New bridge-in cooldown (in seconds)"
     }
   }
 }

@@ -7,6 +7,7 @@ import { abi } from "../../../abi.json";
 import { toast } from "react-toastify";
 import { operationEnumToString } from "../utils";
 import {zeroAddress} from "ethers";
+import {ethers} from "ethers";
 
 function useContractOwner() {
   const contractConfig = {
@@ -55,7 +56,7 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
   const modalRef = useRef<any>(null);
   const [operation, setOperation] = useState<string | null>(null);
   const [ target, setTarget ] = useState(ownerAddress);
-  const [ scValue, setScValue ] = useState(0);
+  const [ scValue, setScValue ] = useState<any>(0);
   const [ data, setData ] = useState("0x");
   const { connect } = useConnect({config: wagmiConfig});
   const { writeContractAsync, writeContract } = useContractWrite({config: wagmiConfig});
@@ -71,11 +72,10 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
     setOperation(type);
     setShouldDropdown(false)
     if (type === OperationTypes.Mint) {
-      setTarget(ownerAddress);
       setScValue(3000000);
-    } else {
+    }
+    if (type === OperationTypes.Pause || type === OperationTypes.Unpause) {
       setTarget(ownerAddress);
-      setScValue(0);
     }
   }
 
@@ -85,8 +85,14 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
   }
 
   function onValueChange(e: any) {
+    console.log('operation', operation);
+    if (operation === OperationTypes.UpdateSigner) {
+      setScValue(e.target.value);
+      return
+    }
     const value = Number(e.target.value);
     setScValue(value)
+
   }
 
   function onDataChange(e: any) {
@@ -116,13 +122,33 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
         connect({ connector: injected() })
       }
       let opId = null
-    console.log(operation, OperationTypesMap[operation], target, scValue, data);
+    if (target === "") {
+      setTarget(ownerAddress);
+    }
+    console.log('target', target);
+
+    if (operation === OperationTypes.SetBridgeInLimits) {
+      const newMaxAmount = ethers.parseUnits("20000", 18);  // 20,000 tokens
+      const newCooldown = BigInt(data);  // cooldown in seconds
+      const encodedData = ethers.AbiCoder.defaultAbiCoder().encode(
+        ['uint256'],
+        [newCooldown]
+      );
+      console.log('encodedData', encodedData);
+      setData(encodedData);
+      // setScValue(newMaxAmount);
+    }
+    let finalValue = scValue
+    if (operation === OperationTypes.UpdateSigner) {
+      finalValue = BigInt(scValue)
+    }
+    console.log(operation, OperationTypesMap[operation], target, finalValue, data);
       try{
          opId = await writeContractAsync({
           address: contractAddress,
           abi: abi,
           functionName: "requestOperation",
-          args: [OperationTypesMap[operation], target, scValue, data],
+          args: [OperationTypesMap[operation], target, finalValue, data],
         })
       }catch(e: any){
         toast(e.message);
