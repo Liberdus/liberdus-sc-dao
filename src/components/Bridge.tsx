@@ -4,7 +4,7 @@ import {useRouter} from 'next/navigation';
 import {useEffect, useState} from 'react';
 import styles from './Bridge.module.css';
 import {ethers} from 'ethers';
-import {contractAddress, wagmiConfig, chainId, ownerAddress} from '@/app/wagmi';
+import {contractAddress, wagmiConfig, ownerAddress} from '@/app/wagmi';
 import {abi} from '../../abi.json';
 import {toast} from 'react-toastify';
 import {useAccount} from 'wagmi';
@@ -20,8 +20,10 @@ export default function Bridge({params}: { params: { operationId: string } }) {
 
   const [target, setTarget] = useState(ownerAddress);
   const [amount, setAmount] = useState("10");
-  const [txId, setTxId] = useState("fake txId");
+  const [txId, setTxId] = useState("testTxId");
   const [bridgeType, setBridgeType] = useState("bridge_out");
+  const [chainId, setChainId] = useState<number | null>(null);
+
 
   useEffect(() => {
     if (window.ethereum) {
@@ -29,6 +31,33 @@ export default function Bridge({params}: { params: { operationId: string } }) {
       setProvider(provider);
     }
   }, []);
+
+  useEffect(() => {
+    async function getChainId() {
+      if (provider) {
+        const network = await provider.getNetwork();
+        console.log('network', network.chainId);
+        setChainId(Number(network.chainId));
+      }
+    }
+
+    getChainId();
+
+    // Optional: listen for network changes
+    if (window.ethereum) {
+      window.ethereum.on('chainChanged', (newChainId: string) => {
+        setChainId(Number(newChainId));
+      });
+    }
+
+    return () => {
+      if (window.ethereum) {
+        window.ethereum.removeListener('chainChanged', () => {
+          console.log('chainChanged listener removed');
+        });
+      }
+    };
+  }, [provider]);
 
   const onClickBridgeInOrOut = async () => {
     try {
@@ -38,8 +67,9 @@ export default function Bridge({params}: { params: { operationId: string } }) {
       const bridgeAmount = ethers.parseUnits(amount, 18);
       let tx
       if (bridgeType === "bridge_in") {
-        tx = await contractWithSigner.bridgeIn(target, bridgeAmount, chainId, txId);
+        tx = await contractWithSigner.bridgeIn(target, bridgeAmount, chainId, ethers.id(txId));
       } else if (bridgeType === "bridge_out") {
+        console.log("bridge out", bridgeAmount, target, chainId)
         tx = await contractWithSigner.bridgeOut(bridgeAmount, target, chainId);
       }
       if (tx == null) {

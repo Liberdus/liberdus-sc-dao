@@ -37,7 +37,7 @@ export const wagmiConfig = getDefaultConfig({
 
 export const contractAddress = "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6";
 export const ownerAddress = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
-export const chainId = 1337;
+export const chainId = 31337;
 
 export const defaultLiberdusValues: {
   [key: string]: { target: { default: string, allowed: boolean, placeholder: string }, value: { default: any, allowed: boolean, placeholder: string }, data: { default: string, allowed: boolean, placeholder: string } }
