@@ -1,6 +1,7 @@
 "use client"
 
 import '@rainbow-me/rainbowkit/styles.css';
+import Bridge from '@/components/Bridge';
 
 import {
   RainbowKitProvider,
@@ -12,6 +13,7 @@ import {
 } from "@tanstack/react-query";
 import { wagmiConfig } from "./wagmi";
 import WalletConnect from "./walletConnect.component";
+import {NavWrapper} from './dao/navWrapper.component';
 
 const queryClient = new QueryClient();
 
@@ -26,11 +28,10 @@ export default function Home() {
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
             {!isConnected ? <WalletConnect /> : 
-              <>Development in process</>}
+              <Bridge />}
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
 
   );
 }
-
