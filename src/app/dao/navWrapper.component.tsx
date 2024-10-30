@@ -1,11 +1,12 @@
 import {useAccount, useConnect, useContractWrite, useDisconnect, useContractRead} from "wagmi";
 import styles from "./page.module.css";
-import {contractAddress, wagmiConfig, OperationTypes, defaultLiberdusValues} from "../wagmi";
+import {contractAddress, wagmiConfig, OperationTypes, defaultLiberdusValues, OperationTypesMap, ownerAddress} from "../wagmi";
 import { useEffect, useRef, useState } from "react";
 import { injected } from "wagmi/connectors";
 import { abi } from "../../../abi.json";
 import { toast } from "react-toastify";
 import { operationEnumToString } from "../utils";
+import {zeroAddress} from "ethers";
 
 function useContractOwner() {
   const contractConfig = {
@@ -53,8 +54,8 @@ export default function NavWrapper({ children }: { children: React.ReactNode }) 
 function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, owner: string }) {
   const modalRef = useRef<any>(null);
   const [operation, setOperation] = useState<string | null>(null);
-  const [ target, setTarget ] = useState("");
-  const [ scValue, setScValue ] = useState("");
+  const [ target, setTarget ] = useState(ownerAddress);
+  const [ scValue, setScValue ] = useState(0);
   const [ data, setData ] = useState("0x");
   const { connect } = useConnect({config: wagmiConfig});
   const { writeContractAsync, writeContract } = useContractWrite({config: wagmiConfig});
@@ -62,13 +63,20 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
 
   function resetModal() {
     setTarget("");
-    setScValue("");
+    setScValue(0);
   }
 
-  function onOperationTypeChange(value) {
+  function onOperationTypeChange(type) {
     resetModal();
-    setOperation(value);
+    setOperation(type);
     setShouldDropdown(false)
+    if (type === OperationTypes.Mint) {
+      setTarget(ownerAddress);
+      setScValue(3000000);
+    } else {
+      setTarget(ownerAddress);
+      setScValue(0);
+    }
   }
 
   function onTargetChange(e: any) {
@@ -108,12 +116,13 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
         connect({ connector: injected() })
       }
       let opId = null
+    console.log(operation, OperationTypesMap[operation], target, scValue, data);
       try{
          opId = await writeContractAsync({
           address: contractAddress,
           abi: abi,
           functionName: "requestOperation",
-          args: [operation, target, scValue, data],
+          args: [OperationTypesMap[operation], target, scValue, data],
         })
       }catch(e: any){
         toast(e.message);
@@ -180,12 +189,12 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
             }
         </div>
         <div className={styles.textForms}>
-          <input type="text" name="target" id="target" placeholder={getPlaceHolder("target").placeholder} value={target ? target : getPlaceHolder("target").default}
+          <input type="text" name="target" id="target" placeholder={getPlaceHolder("target").placeholder} value={target}
                  onChange={onTargetChange} disabled={getPlaceHolder("target").disabled} style={{display: getPlaceHolder("target").disabled ? 'none' : 'block'}}
           />
         </div>
         <div className={styles.textForms}>
-          <input type="text" name="scValue" id="scValue" placeholder={getPlaceHolder("value").placeholder} value={scValue ? scValue : getPlaceHolder("value").default} onChange={onValueChange} disabled={getPlaceHolder("value").disabled} style={{display: getPlaceHolder("value").disabled ? 'none' : 'block'}}/>
+          <input type="text" name="scValue" id="scValue" placeholder={getPlaceHolder("value").placeholder} value={scValue} onChange={onValueChange} disabled={getPlaceHolder("value").disabled} style={{display: getPlaceHolder("value").disabled ? 'none' : 'block'}}/>
         </div>
           <div className={styles.textForms}>
             <input type="text" name="Data" id="Data" placeholder={getPlaceHolder("data").placeholder} disabled={getPlaceHolder("data").disabled} onChange={onDataChange} style={{display: getPlaceHolder("data").disabled ? 'none' : 'block'}}/>
