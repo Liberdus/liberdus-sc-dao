@@ -35,4 +35,157 @@ export const wagmiConfig = getDefaultConfig({
   ssr: true, // If your dApp uses server side rendering (SSR)
 });
 
-export const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+export const contractAddress = "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6";
+export const ownerAddress = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+
+export const defaultLiberdusValues: {
+  [key: string]: { target: { default: string, allowed: boolean, placeholder: string }, value: { default: any, allowed: boolean, placeholder: string }, data: { default: string, allowed: boolean, placeholder: string } }
+} = {
+  Mint: {
+    target: {
+      default: ownerAddress,
+      allowed: true,
+      placeholder: "Mint target address"
+    },
+    value: {
+      default: 3000000,
+      allowed: true,
+      placeholder: "Mint value"
+    },
+    data: {
+      default: "",
+      allowed: false,
+      placeholder: "Mint data"
+    }
+  },
+  Burn: {
+    target: {
+      default: ownerAddress,
+      allowed: true,
+      placeholder: "Burn target address"
+    },
+    value: {
+      default: "",
+      allowed: true,
+      placeholder: "Burn value"
+    },
+    data: {
+      default: "",
+      allowed: false,
+      placeholder: "Burn data"
+    }
+  },
+  PostLaunch: {
+    target: {
+      default: "",
+      allowed: false,
+      placeholder: "Post launch target address"
+    },
+    value: {
+      default: "",
+      allowed: false,
+      placeholder: "Post launch value"
+    },
+    data: {
+      default: "",
+      allowed: false,
+      placeholder: "Post launch data"
+    }
+  },
+  UpdateSigner: {
+    target: {
+      default: "",
+      allowed: true,
+      placeholder: "Old signer address"
+    },
+    value: {
+      default: "",
+      allowed: true,
+      placeholder: "New signer address"
+    },
+    data: {
+      default: "",
+      allowed: false,
+      placeholder: "Update signer data"
+    },
+  },
+  Pause: {
+    target: {
+      default: "",
+      allowed: false,
+      placeholder: ""
+    },
+    value: {
+      default: "",
+      allowed: false,
+      placeholder: ""
+    },
+    data: {
+      default: "",
+      allowed: false,
+      placeholder: ""
+    }
+  },
+  Unpause: {
+    target: {
+      default: "",
+      allowed: false,
+      placeholder: ""
+    },
+    value: {
+      default: "",
+      allowed: false,
+      placeholder: ""
+    },
+    data: {
+      default: "0x",
+      allowed: false,
+      placeholder: ""
+    }
+  },
+  SetBridgeInCaller: {
+    target: {
+      default: "",
+      allowed: true,
+      placeholder: "New bridge-in caller address"
+    },
+    value: {
+      default: "",
+      allowed: false,
+      placeholder: ""
+    },
+    data: {
+      default: "0x",
+      allowed: false,
+      placeholder: "Set bridge in caller data"
+    }
+  },
+  SetBridgeInLimits: {
+    target: {
+      default: 10000,
+      allowed: true,
+      placeholder: "New bridge-in max amount"
+    },
+    value: {
+      default: 60,
+      allowed: true,
+      placeholder: "New bridge-in cooldown (in seconds)"
+    },
+    data: {
+      default: "0x",
+      allowed: false,
+      placeholder: "Set bridge in limits data"
+    }
+  }
+}
+
+export enum OperationTypes {
+  Mint = "Mint",
+  Burn = "Burn",
+  PostLaunch = "PostLaunch",
+  Pause = "Pause",
+  Unpause = "Unpause",
+  SetBridgeInCaller = "SetBridgeInCaller",
+  SetBridgeInLimits = "SetBridgeInLimits",
+  UpdateSigner = "UpdateSigner",
+}

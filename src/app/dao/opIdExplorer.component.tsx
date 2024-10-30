@@ -45,7 +45,7 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
 
               <div className={styles.opEntryRight}>
                 <div className={styles.eventItem}>
-                  <div className={styles.eventItemLabel}>Func(): </div>
+                  <div className={styles.eventItemLabel}>Operation: </div>
                   <div>{operationEnumToString(Number(decoded?.[1]))}</div>
                 </div>
                 <div className={styles.eventItem}>

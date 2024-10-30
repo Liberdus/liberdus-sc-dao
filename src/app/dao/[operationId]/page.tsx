@@ -91,7 +91,7 @@ export default function ProposalDetails({params}: { params: { operationId: strin
 
     return completeOperationFacts;
   };
-  
+
   const handleSign = async () => {
     try {
       if (!contract || !signer) throw new Error('Contract or signer not ready');
@@ -100,13 +100,41 @@ export default function ProposalDetails({params}: { params: { operationId: strin
       toast(`Operation hash: ${messageHash}`);
 
       const signature = await signer.signMessage(ethers.getBytes(messageHash));
-      // const recovered = ethers.verifyMessage(ethers.getBytes(messageHash), signature);
 
       const contractWithSigner = contract.connect(signer) as any;
       const tx = await contractWithSigner.submitSignature(params.operationId, signature);
 
-      // const receipt = await tx.wait();
+      // Wait for the transaction to be mined
+      const receipt = await tx.wait();
 
+      // Access the raw logs from the receipt
+      const rawLogs = receipt.logs;
+
+      // Parse and decode the logs using the contract interface
+      const events = rawLogs
+        // Filter logs emitted by your contract (optional but recommended)
+        .filter(log => log.address.toLowerCase() === contractAddress.toLowerCase())
+        .map(log => {
+          try {
+            // Parse the log to get the event object
+            return contract.interface.parseLog(log);
+          } catch (error) {
+            // If the log is not from your contract's events, ignore it
+            return null;
+          }
+        })
+        // Remove any null entries resulting from failed parses
+        .filter(event => event !== null);
+
+      // Now you have an array of decoded events
+      console.log('Decoded Events:', events);
+
+      // You can process the events as needed
+      events.forEach(event => {
+        console.log(`Event ${event.name} emitted with args:`, event.args);
+      });
+
+      // Continue with your existing logic
       getOperationFactsById(params.operationId).then(setOperationFacts);
 
       toast(`Submitted Signature: ${tx.hash}`);
@@ -115,8 +143,6 @@ export default function ProposalDetails({params}: { params: { operationId: strin
       toast(e.message);
     }
   };
-
-
 
   useEffect(() => {
     if(operationFacts === null && contract){
@@ -138,13 +164,13 @@ export default function ProposalDetails({params}: { params: { operationId: strin
     <div className={styles.container}>
       <div className={styles.containerBody}>
         <div className={styles.keys}>
-          <div className={styles.key}>Func():</div>
+          <div className={styles.key}>Operation:</div>
           <div className={styles.key}>Target:</div>
           <div className={styles.key}>Value:</div>
           <div className={styles.key}>Data:</div>
-          <div className={styles.key}>Signed:</div>
+          <div className={styles.key}>Signatures:</div>
           <div className={styles.key}>Executed:</div>
-          <div className={styles.key}>ProposedBy:</div>
+          <div className={styles.key}>Proposed By:</div>
           <div className={styles.key}>Proposed Date:</div>
         </div>
         <div className={styles.values}>

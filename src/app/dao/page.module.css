@@ -77,7 +77,8 @@
   align-items: center;
 }
 .modalContent{
-  max-width: 50%;
+    /*max-width: 50%;*/
+    width: 600px;
   margin: auto;
   padding: 1rem;
   background-color: var(--background-color);
@@ -148,15 +149,17 @@
   font: inherit; /* Ensures the font style is inherited from parent */
   color: inherit; /* Ensures text color is inherited */
   border-bottom: 2px solid var(--primary-text-color);
+    width: 100%;
 }
 .textForms > input::placeholder {
   color: var(--secondary-text-color);
 }
 .modalButtons{
-  max-width: 100%;
+  width: 100%;
   /* margin: auto; */
   padding: 1rem;
-  margin: 1rem;
+  margin-bottom: 1rem;
+    text-align: center;
   background-color: var(--background-color);
   font-family: 'Merriweather', serif;
   color: var(--primary-text-color);
@@ -166,6 +169,11 @@
 .modalButtons:hover{
   background-color: var(--code-background-color);
   cursor: pointer;
+}
+.modalButtons:disabled {
+    background-color: #ccc;  /* Example: change color to indicate disabled */
+    cursor: not-allowed;     /* Changes the cursor to indicate it’s not clickable */
+    opacity: 0.6;            /* Makes it look visually disabled */
 }
 
 .navInner {
