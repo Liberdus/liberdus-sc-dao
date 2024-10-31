@@ -13,7 +13,7 @@ import {
 } from "@tanstack/react-query";
 import { wagmiConfig } from "./wagmi";
 import WalletConnect from "./walletConnect.component";
-import {NavWrapper} from './dao/navWrapper.component';
+import NavWrapper from './dao/navWrapper.component';
 
 const queryClient = new QueryClient();
 
@@ -28,10 +28,18 @@ export default function Home() {
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
             {!isConnected ? <WalletConnect /> : 
-              <Bridge />}
+              <WrappedHome/>}
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
 
   );
+}
+
+function WrappedHome() {
+  return (
+    <NavWrapper>
+      <Bridge />
+    </NavWrapper>
+  )
 }

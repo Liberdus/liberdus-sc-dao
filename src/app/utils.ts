@@ -17,7 +17,7 @@ export const operationEnumToString = (op: number | null) => {
     case 7:
       return "UpdateSigner";
     case 8:
-      return "Distibute";
+      return "Distribute";
     default:
       return "Select Operation";
   }

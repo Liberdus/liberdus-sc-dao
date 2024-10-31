@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { operationEnumToString } from "../utils";
 import {zeroAddress} from "ethers";
 import {ethers} from "ethers";
+import { useRouter } from "next/navigation";
 
 function useContractOwner() {
   const contractConfig = {
@@ -28,6 +29,7 @@ export default function NavWrapper({ children }: { children: React.ReactNode }) 
   const [ isModal, setIsModal ] = useState(false);
   const navBarRef = useRef<any>(null);
   const [ offsetBody, setOffsetBody ] = useState(0);
+  const router = useRouter();
 
   const owner = useContractOwner();
   useEffect(() => {
@@ -40,6 +42,8 @@ export default function NavWrapper({ children }: { children: React.ReactNode }) 
         <div className={styles.navLeft}><h2>Liberdus Smart Contract Governance</h2></div>
         <div className={styles.navRight}>
           <div className={styles.proposal} onClick={()=>{setIsModal(true)}}>Propose</div>
+          <div className={styles.proposal} onClick={()=>{router.push("/dao")}}>Proposals</div>
+          <div className={styles.proposal} onClick={()=>{router.push("/")}}>Bridging</div>
           <div className={styles.address}>{ isConnected && address }</div>
           <div className={styles.disconnectBtn} onClick={(e)=>{disconnect()}}>Disconnect</div>
         </div>
@@ -148,6 +152,10 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
       const amountInWei = ethers.parseUnits(String(scValue), 18);
       finalValue = amountInWei;
     }
+    if (operation === OperationTypes.Burn) {
+      const amountInWei = ethers.parseUnits(String(scValue), 18);
+      finalValue = amountInWei;
+    }
     console.log(operation, OperationTypesMap[operation], target, finalValue, data);
       try{
          opId = await writeContractAsync({
@@ -230,6 +238,7 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
         </div>
         <div className={styles.textForms}>
           <input type="text" name="scValue" id="scValue" placeholder={getPlaceHolder("value").placeholder} value={scValue} onChange={onValueChange} disabled={getPlaceHolder("value").disabled} style={{display: getPlaceHolder("value").disabled ? 'none' : 'block'}}/>
+          <div className={styles.ethWei}>{ }</div>
         </div>
           <div className={styles.textForms}>
             <input type="text" name="Data" id="Data" placeholder={getPlaceHolder("data").placeholder} disabled={getPlaceHolder("data").disabled} onChange={onDataChange} style={{display: getPlaceHolder("data").disabled ? 'none' : 'block'}}/>

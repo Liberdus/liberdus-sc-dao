@@ -9,6 +9,7 @@ import { abi } from '../../../../abi.json';
 import { operationEnumToString } from '@/app/utils';
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
+import { BigNumberish } from 'ethers';
 
 export default function ProposalDetails({params}: { params: { operationId: string }}){
   const router = useRouter();
@@ -177,6 +178,10 @@ export default function ProposalDetails({params}: { params: { operationId: strin
     }
   }
 
+  function weiToEth(wei: BigNumberish) {
+    return ethers.formatEther(wei);
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.containerBody}>
@@ -193,7 +198,10 @@ export default function ProposalDetails({params}: { params: { operationId: strin
         <div className={styles.values}>
           <div className={styles.value}>{operationEnumToString(operationFacts.type)}</div>
           <div className={styles.value}>{operationFacts.target}</div>
-          <div className={styles.value}>{operationFacts.value.toString()}</div>
+          <div className={styles.value}>{ 
+            (operationFacts.type == 1 || operationFacts.type == 8) ? `${weiToEth(operationFacts.value as BigNumberish)} LBD`:
+            operationFacts.value.toString()
+          }</div>
           <div className={styles.value}>{getDecodedData(operationFacts)}</div>
           <div className={styles.value}>{operationFacts.signed.toString()}/{operationFacts.sigRequired.toString()}</div>
           <div className={styles.value}>{operationFacts.executed ? "True" : "False"}</div>
