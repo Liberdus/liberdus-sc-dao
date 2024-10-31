@@ -72,6 +72,7 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
     setOperation(type);
     setShouldDropdown(false)
     if (type === OperationTypes.Mint) {
+      setTarget(contractAddress);
       setScValue(3000000);
     }
     if (type === OperationTypes.Pause || type === OperationTypes.Unpause) {
@@ -138,9 +139,14 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
       setData(encodedData);
       // setScValue(newMaxAmount);
     }
+
     let finalValue = scValue
     if (operation === OperationTypes.UpdateSigner) {
       finalValue = BigInt(scValue)
+    }
+    if (operation === OperationTypes.Distribute) {
+      const amountInWei = ethers.parseUnits(String(scValue), 18);
+      finalValue = amountInWei;
     }
     console.log(operation, OperationTypesMap[operation], target, finalValue, data);
       try{
@@ -191,6 +197,9 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
                   onOperationTypeChange(OperationTypes.Mint);
                 }}>Mint</a>
                 <a href="#" onClick={() => {
+                  onOperationTypeChange(OperationTypes.Distribute);
+                }}>Distribute</a>
+                <a href="#" onClick={() => {
                   onOperationTypeChange(OperationTypes.Burn);
                 }}>Burn</a>
                 <a href="#" onClick={() => {
@@ -213,7 +222,7 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
                 }}>UpdateSigner</a>
               </div>
             }
-        </div>
+         </div>
         <div className={styles.textForms}>
           <input type="text" name="target" id="target" placeholder={getPlaceHolder("target").placeholder} value={target}
                  onChange={onTargetChange} disabled={getPlaceHolder("target").disabled} style={{display: getPlaceHolder("target").disabled ? 'none' : 'block'}}

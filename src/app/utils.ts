@@ -16,6 +16,8 @@ export const operationEnumToString = (op: number | null) => {
       return "SetBridgeInLimits";
     case 7:
       return "UpdateSigner";
+    case 8:
+      return "Distibute";
     default:
       return "Select Operation";
   }

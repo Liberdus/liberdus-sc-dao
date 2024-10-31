@@ -7,6 +7,9 @@ import {
   optimism,
   arbitrum,
   base,
+  polygonAmoy,
+  polygonMumbai,
+  sepolia
 } from 'wagmi/chains';
 
 export const localchain = {
@@ -32,18 +35,35 @@ export const localchain = {
 export const wagmiConfig = getDefaultConfig({
   appName: 'Liberdus Bridging And Governance',
   projectId: 'a456240005ff39a4d2dc51d18ffa4ad9',
-  chains: [mainnet, localchain],
+  chains: [mainnet, localchain, polygon, polygonAmoy, polygonMumbai, sepolia],
   ssr: true, // If your dApp uses server side rendering (SSR)
 });
 
-export const contractAddress = "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6";
-export const ownerAddress = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+export const contractAddress = "0xEadcbd9115Eb06698ba6e1Cd7BB4C6381f9E6729";
+export const ownerAddress = "0x32B6f2C027D4c9D99Ca07d047D17987390a5EB39";
 export const chainId = 31337;
 
 export const defaultLiberdusValues: {
   [key: string]: { target: { default: string, allowed: boolean, placeholder: string }, value: { default: any, allowed: boolean, placeholder: string }, data: { default: string, allowed: boolean, placeholder: string } }
 } = {
   Mint: {
+    target: {
+      default: contractAddress,
+      allowed: false,
+      placeholder: "Mint target address"
+    },
+    value: {
+      default: 3000000,
+      allowed: false,
+      placeholder: "Mint value"
+    },
+    data: {
+      default: "",
+      allowed: false,
+      placeholder: "Mint data"
+    }
+  },
+  Distribute: {
     target: {
       default: ownerAddress,
       allowed: true,
@@ -190,6 +210,7 @@ export enum OperationTypes {
   SetBridgeInCaller = "SetBridgeInCaller",
   SetBridgeInLimits = "SetBridgeInLimits",
   UpdateSigner = "UpdateSigner",
+  Distribute = "Distribute",
 }
 
 export const OperationTypesMap = {
@@ -201,4 +222,5 @@ export const OperationTypesMap = {
   SetBridgeInCaller: 5,
   SetBridgeInLimits: 6,
   UpdateSigner: 7,
+  Distribute: 8,
 }
