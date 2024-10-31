@@ -1,27 +1,25 @@
-import {useAccount, useConnect, useContractWrite, useDisconnect, useContractRead} from "wagmi";
+import {useAccount, useConnect, useDisconnect, useContractRead, useWriteContract} from "wagmi";
 import styles from "./page.module.css";
 import {contractAddress, wagmiConfig, OperationTypes, defaultLiberdusValues, OperationTypesMap, ownerAddress} from "../wagmi";
 import { useEffect, useRef, useState } from "react";
 import { injected } from "wagmi/connectors";
 import { abi } from "../../../abi.json";
 import { toast } from "react-toastify";
-import { operationEnumToString } from "../utils";
-import {zeroAddress} from "ethers";
 import {ethers} from "ethers";
 import { useRouter } from "next/navigation";
 
-function useContractOwner() {
-  const contractConfig = {
-    address: contractAddress,
-    abi: abi,
-  };
-  const {data: owner, isLoading, isError} = useContractRead({
-    ...contractConfig,
-    functionName: 'owner',
-  });
-
-  return owner
-}
+// function useContractOwner() {
+//   const contractConfig = {
+//     address: contractAddress,
+//     abi: abi,
+//   };
+//   const {data: owner, isLoading, isError} = useContractRead({
+//     ...contractConfig,
+//     functionName: 'owner',
+//   });
+//
+//   return owner
+// }
 
 export default function NavWrapper({ children }: { children: React.ReactNode }) {
   const { address, isConnected } = useAccount({config: wagmiConfig});
@@ -31,7 +29,12 @@ export default function NavWrapper({ children }: { children: React.ReactNode }) 
   const [ offsetBody, setOffsetBody ] = useState(0);
   const router = useRouter();
 
-  const owner = useContractOwner();
+  const { data: owner } = useContractRead({
+    address: contractAddress,
+    abi: abi,
+    functionName: 'owner',
+  });
+
   useEffect(() => {
     setOffsetBody(navBarRef?.current?.offsetHeight || 0);
   }, [navBarRef]);
@@ -50,7 +53,7 @@ export default function NavWrapper({ children }: { children: React.ReactNode }) 
       </div>
       <div className={styles.navInner}>
         <div style={{height: offsetBody}}></div>
-        {isModal && <ProposalModal setIsModal={setIsModal} owner={owner}/>}
+        {isModal && <ProposalModal setIsModal={setIsModal} owner={owner as string}/>}
         { children }
       </div>
     </div>)
@@ -58,12 +61,12 @@ export default function NavWrapper({ children }: { children: React.ReactNode }) 
 
 function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, owner: string }) {
   const modalRef = useRef<any>(null);
-  const [operation, setOperation] = useState<string | null>(null);
+  const [operation, setOperation] = useState<string>("");
   const [ target, setTarget ] = useState(ownerAddress);
   const [ scValue, setScValue ] = useState<any>(0);
   const [ data, setData ] = useState("0x");
   const { connect } = useConnect({config: wagmiConfig});
-  const { writeContractAsync, writeContract } = useContractWrite({config: wagmiConfig});
+  const { writeContractAsync } = useWriteContract({config: wagmiConfig});
   const { address, isConnected } = useAccount({config: wagmiConfig});
 
   function resetModal() {
@@ -71,7 +74,7 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
     setScValue(0);
   }
 
-  function onOperationTypeChange(type) {
+  function onOperationTypeChange(type: string) {
     resetModal();
     setOperation(type);
     setShouldDropdown(false)
@@ -105,9 +108,9 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
   }
 
   function getPlaceHolder(inputField: string) {
-    if (operation == null) {
+    if (operation == "") {
       return {
-        placeholder: "",
+        placeholder: "Select An Operation To Request",
         disabled: true,
         default: ""
       }
@@ -123,6 +126,7 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
   }
 
   const scRequestOperation = async () => {
+    if(!operation){ return }
       if(!isConnected){
         connect({ connector: injected() })
       }
@@ -156,14 +160,15 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
       const amountInWei = ethers.parseUnits(String(scValue), 18);
       finalValue = amountInWei;
     }
-    console.log(operation, OperationTypesMap[operation], target, finalValue, data);
+
+    console.log(operation, OperationTypesMap[operation as (keyof typeof OperationTypesMap)], target, finalValue, data);
       try{
          opId = await writeContractAsync({
           address: contractAddress,
           abi: abi,
           functionName: "requestOperation",
-          args: [OperationTypesMap[operation], target, finalValue, data],
-        })
+          args: [OperationTypesMap[operation as (keyof typeof OperationTypesMap)], target, finalValue, data],
+        } as any)
       }catch(e: any){
         toast(e.message);
       }
@@ -198,7 +203,7 @@ function ProposalModal({setIsModal, owner}: { setIsModal: (x: boolean) => void, 
          <div className={styles.dropdown}>
            <button className={styles.dropdownButton} onClick={() => {
              setShouldDropdown(true)
-           }}>{operation ? operation : "Select an operation to request"}</button>
+           }}>{(operation !== "") ? operation : "Select an operation to request"}</button>
             { shouldDropdown &&
               <div className={styles.dropdownContent}>
                 <a href="#" onClick={() => {

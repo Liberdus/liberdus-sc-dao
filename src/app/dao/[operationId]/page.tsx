@@ -23,10 +23,10 @@ export default function ProposalDetails({params}: { params: { operationId: strin
   type OperationFacts = {
     type: number,
     target: string,
-    value: BigInt,
+    value: bigint | string | number,
     data: string,
-    signed: Number,
-    sigRequired: Number,
+    signed: number,
+    sigRequired: number,
     approvers: string[],
     executed: boolean
     proposer: string,
@@ -47,7 +47,7 @@ export default function ProposalDetails({params}: { params: { operationId: strin
 
       console.log(basicOperationFacts);
 
-      let completeOperationFacts: OperationFacts = {
+      const completeOperationFacts: OperationFacts = {
         type: Number(BigInt(basicOperationFacts[0])),
         target: basicOperationFacts[1].toString(),
         value: BigInt(basicOperationFacts[2]),
@@ -61,7 +61,7 @@ export default function ProposalDetails({params}: { params: { operationId: strin
       }
       if (basicOperationFacts[0] == OperationTypesMap[OperationTypes.UpdateSigner]) {
         completeOperationFacts.sigRequired = 2
-        completeOperationFacts.value = ethers.getAddress(ethers.toBeHex(completeOperationFacts.value, 20));
+        completeOperationFacts.value = ethers.getAddress(ethers.toBeHex(completeOperationFacts.value as BigNumberish, 20));
       }
 
 
@@ -118,8 +118,8 @@ export default function ProposalDetails({params}: { params: { operationId: strin
       // Parse and decode the logs using the contract interface
       const events = rawLogs
         // Filter logs emitted by your contract (optional but recommended)
-        .filter(log => log.address.toLowerCase() === contractAddress.toLowerCase())
-        .map(log => {
+        .filter((log:any) => log.address.toLowerCase() === contractAddress.toLowerCase())
+        .map((log:any) => {
           try {
             // Parse the log to get the event object
             return contract.interface.parseLog(log);
@@ -129,13 +129,13 @@ export default function ProposalDetails({params}: { params: { operationId: strin
           }
         })
         // Remove any null entries resulting from failed parses
-        .filter(event => event !== null);
+        .filter((event:any)=> event !== null);
 
       // Now you have an array of decoded events
       console.log('Decoded Events:', events);
 
       // You can process the events as needed
-      events.forEach(event => {
+      events.forEach((event:any) => {
         console.log(`Event ${event.name} emitted with args:`, event.args);
       });
 
@@ -165,7 +165,7 @@ export default function ProposalDetails({params}: { params: { operationId: strin
     return <div>Loading...</div>
   }
 
-  function getDecodedData(operationFacts) {
+  function getDecodedData(operationFacts: OperationFacts) {
     console.log('operationFacts', operationFacts);
     if (operationFacts.type === OperationTypesMap[OperationTypes.SetBridgeInLimits]) {
       console.log('operationFacts.data', operationFacts.data);
@@ -219,3 +219,4 @@ export default function ProposalDetails({params}: { params: { operationId: strin
     </div>
   );
 }
+

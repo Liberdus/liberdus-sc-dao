@@ -9,7 +9,7 @@ import {abi} from '../../abi.json';
 import {toast} from 'react-toastify';
 import {useAccount} from 'wagmi';
 
-export default function Bridge({params}: { params: { operationId: string } }) {
+export default function Bridge() {
   const router = useRouter();
   const {address, isConnected} = useAccount({config: wagmiConfig});
 
