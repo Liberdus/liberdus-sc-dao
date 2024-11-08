@@ -39,9 +39,9 @@ export const wagmiConfig = getDefaultConfig({
   ssr: true, // If your dApp uses server side rendering (SSR)
 });
 
-export const contractAddress = "0xEadcbd9115Eb06698ba6e1Cd7BB4C6381f9E6729";
-export const ownerAddress = "0x32B6f2C027D4c9D99Ca07d047D17987390a5EB39";
-export const chainId = 31337;
+export const contractAddress = "0x693ed886545970F0a3ADf8C59af5cCdb6dDF0a76";
+export const ownerAddress = "0x35900740c20F8219791F9E4994938662D75c65E5";
+export const chainId = 137;
 
 export const defaultLiberdusValues: {
   [key: string]: { target: { default: string, allowed: boolean, placeholder: string }, value: { default: any, allowed: boolean, placeholder: string }, data: { default: string, allowed: boolean, placeholder: string } }

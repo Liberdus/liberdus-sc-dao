@@ -316,12 +316,6 @@
         },
         {
           "indexed": false,
-          "internalType": "bytes32",
-          "name": "txId",
-          "type": "bytes32"
-        },
-        {
-          "indexed": false,
           "internalType": "uint256",
           "name": "timestamp",
           "type": "uint256"
@@ -480,6 +474,12 @@
           "internalType": "bytes",
           "name": "data",
           "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "deadline",
+          "type": "uint256"
         },
         {
           "indexed": false,
@@ -689,6 +689,19 @@
     {
       "inputs": [],
       "name": "MINT_INTERVAL",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "OPERATION_DEADLINE",
       "outputs": [
         {
           "internalType": "uint256",
@@ -941,6 +954,25 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "operationId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "isOperationExpired",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "isPreLaunch",
       "outputs": [
@@ -1076,6 +1108,11 @@
           "internalType": "bool",
           "name": "executed",
           "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "deadline",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
