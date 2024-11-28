@@ -1,5 +1,4 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
-import { zeroAddress } from "ethers";
 
 import {
   mainnet,

@@ -75,7 +75,7 @@ export default function ProposalDetails({params}: { params: { operationId: strin
     for (const event of events) {
       if(event?.args[0].toString() == params.operationId){
         completeOperationFacts.proposer = event.args[2].toString();
-        completeOperationFacts.proposedTimestamp = new Date(Number(BigInt(event.args[6]))*1000).getTime();
+        completeOperationFacts.proposedTimestamp = new Date(Number(BigInt(event.args[7]))*1000).getTime();
         break;
       }
     }

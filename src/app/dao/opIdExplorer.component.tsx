@@ -50,7 +50,7 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
                 </div>
                 <div className={styles.eventItem}>
                   <div className={styles.eventItemLabel}>Date: </div>
-                  <div>{new Date(Number(decoded?.[6]) * 1000).toLocaleString()} </div>
+                  <div>{new Date(Number(decoded[7]) * 1000).toLocaleString()} </div>
                 </div>
               </div>
             </Link>
