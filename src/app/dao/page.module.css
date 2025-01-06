@@ -191,13 +191,13 @@
 }
 
 .opIdExplorerEvent {
-  width: 80%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   border-bottom: 2px solid black;
   transition: all 0.3s;
+  width: 80%;
 }
 .opIdExplorerEvent:hover {
   background-color: black;
@@ -262,4 +262,30 @@ o
   background-color: black;
   color: var(--background-color);
   cursor: pointer;
+}
+
+.filters {
+  display: flex;
+  flex-direction: row;
+  background-color: var(--background-color);
+  /* border-bottom: 1px solid black; */
+}
+
+.filterItem {
+  font-family: 'Lato', serif;
+  font-size: .9rem;
+  color: var(--secondary-text-color);
+  cursor: pointer;
+  padding: 1rem;
+  opacity: 0.8;
+  transition: all 0.3s;
+}
+
+.filterItem:hover {
+  color: var(--primary-text-color);
+  opacity: 0.9;
+}
+
+.bufferZone {
+  padding: 1rem;
 }

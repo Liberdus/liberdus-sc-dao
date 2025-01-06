@@ -31,6 +31,7 @@ export default function ProposalDetails({params}: { params: { operationId: strin
     executed: boolean
     proposer: string,
     proposedTimestamp: number
+    deadline: number
     
   }
   const [ operationFacts, setOperationFacts ] = useState<OperationFacts | null>(null);
@@ -56,6 +57,7 @@ export default function ProposalDetails({params}: { params: { operationId: strin
         executed: basicOperationFacts[5],
         proposer: "" ,
         proposedTimestamp: Date.now(),
+        deadline: 0,
         approvers: [],
         sigRequired: 3, 
       }
@@ -92,6 +94,8 @@ export default function ProposalDetails({params}: { params: { operationId: strin
         completeOperationFacts.sigRequired = Number(BigInt(event.args[3]));
       }
     }
+
+    completeOperationFacts.deadline = new Date(Number(basicOperationFacts[6])*1000).getTime();
 
 
     return completeOperationFacts;
@@ -194,6 +198,7 @@ export default function ProposalDetails({params}: { params: { operationId: strin
           <div className={styles.key}>Executed:</div>
           <div className={styles.key}>Proposed By:</div>
           <div className={styles.key}>Proposed Date:</div>
+          <div className={styles.key}>Deadline:</div>
         </div>
         <div className={styles.values}>
           <div className={styles.value}>{operationEnumToString(operationFacts.type)}</div>
@@ -207,6 +212,7 @@ export default function ProposalDetails({params}: { params: { operationId: strin
           <div className={styles.value}>{operationFacts.executed ? "True" : "False"}</div>
           <div className={styles.value}>{operationFacts.proposer}</div>
           <div className={styles.value}>{new Date(operationFacts.proposedTimestamp).toLocaleString()}</div>
+          <div className={styles.value}>{new Date(operationFacts.deadline).toLocaleString()}</div>
         </div>
       </div>
 
