@@ -1,5 +1,7 @@
 export const operationEnumToString = (op: number | null) => {
   switch(op){
+    case -1:
+      return "All";
     case 0:
       return "Mint";
     case 1:
@@ -22,3 +24,4 @@ export const operationEnumToString = (op: number | null) => {
       return "Select Operation";
   }
 }
+

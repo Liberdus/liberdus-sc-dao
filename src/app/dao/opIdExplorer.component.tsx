@@ -14,8 +14,9 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
   const [modalOpId, setModalOpId] = useState<string>("");
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const contract = provider ? new ethers.Contract(contractAddress, abi, provider) : null;
-  const [filter, setFilter] = useState<string>("all");
-  const filterOptions = ["all", "active", "expired", "executed"];
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("All");
+  const statusFilterOptions = ["all", "active", "expired", "executed"];
 
   useEffect(() => {
     if (window.ethereum) {
@@ -25,11 +26,13 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
   }, []);
 
   useEffect(() => {
-    if (filter === "all") {
-      setFilteredEvents(events);
+    if (statusFilter === "all") {
+      setFilteredEvents(
+        filterEventByType(events)
+      );
     }
 
-    if (filter === "executed") {
+    if (statusFilter === "executed") {
       let promises = events.map(async (event) => {
         const decoded = contract?.interface.decodeEventLog(
           "OperationRequested",
@@ -51,11 +54,13 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
           const operation = ops[index];
           return operation[5];
         });
-        setFilteredEvents(executedEvents);
+        setFilteredEvents(
+          filterEventByType(executedEvents)
+        );
       });
     }
 
-    if (filter === "expired") {
+    if (statusFilter === "expired") {
       let promises = events.map(async (event) => {
         const decoded = contract?.interface.decodeEventLog(
           "OperationRequested",
@@ -80,11 +85,13 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
           const executed = operation[5];
           return expired && !executed;
         });
-        setFilteredEvents(expiredEvents);
+        setFilteredEvents(
+          filterEventByType(expiredEvents)
+        );
       });
     }
 
-    if (filter === "active") {
+    if (statusFilter === "active") {
       let promises = events.map(async (event) => {
         const decoded = contract?.interface.decodeEventLog(
           "OperationRequested",
@@ -109,10 +116,31 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
           const executed = operation[5];
           return !expired && !executed;
         });
-        setFilteredEvents(activeEvents);
+
+        setFilteredEvents(
+          filterEventByType(activeEvents)
+        );
       });
     }
-  }, [filter, events]);
+
+
+  }, [typeFilter, statusFilter, events]);
+
+  const filterEventByType = (e: (ethers.Log | ethers.EventLog)[]) => {
+    if (typeFilter === "All") return e;
+    return e.filter((event) => {
+      const decoded = contract?.interface.decodeEventLog(
+        "OperationRequested",
+        event.data,
+        event.topics
+      );
+      const operation = operationEnumToString(Number(decoded[1]));
+      console.log(operation, typeFilter);
+      return operation === typeFilter;
+    });
+
+  }
+
 
 
   return (
@@ -120,18 +148,18 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
       <div className={styles.bufferZone}></div>
       <div className={styles.filters}>
         {
-          filterOptions.map((option, index) => {
+          statusFilterOptions.map((option, index) => {
             return (
               <div
                 key={index}
                 onClick={() => { 
-                  if (filter !== option){
-                    setFilter(option) 
+                  if (statusFilter !== option){
+                    setStatusFilter(option) 
                   }
                 }}
                 className={styles.filterItem}
                 style={
-                  filter === option ? {
+                  statusFilter === option ? {
                     color: "black", 
                     opacity: 1,
                     fontWeight: 600,
@@ -143,6 +171,44 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
             )
           })
         }
+      </div>
+      <div className={styles.filters}>
+        {
+          Object.keys(OperationFilterOptions).map((key, index) => {
+            if (Number(key) || (Number(key) == 0)) return;
+            return (
+              <div
+                key={index}
+                onClick={() => { 
+                  if (typeFilter !== key){
+                    setTypeFilter(key) 
+                  }
+                }}
+                className={styles.filterItem}
+                style={
+                  typeFilter === key ? {
+                    color: "black", 
+                    opacity: 1,
+                    fontWeight: 600,
+                  } : {}
+                }
+              >
+                {key} /
+              </div>
+            )
+          })
+        }
+      </div>
+      <div className={styles.filters}>
+              <div
+                onClick={() => { 
+                  setTypeFilter("All")
+                  setStatusFilter("all")
+                }}
+                className={styles.filterItem}
+              >
+                Reset All
+              </div>
       </div>
       {
         filteredEvents.map((event, index) => {
@@ -182,3 +248,15 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
   );
 }
 
+enum OperationFilterOptions {
+  All = -1,
+  Mint = 0,
+  Burn = 1,
+  PostLaunch = 2,
+  Pause = 3,
+  Unpause = 4,
+  SetBridgeInCaller = 5,
+  SetBridgeInLimits = 6,
+  UpdateSigner = 7,
+  Distribute = 8,
+}
