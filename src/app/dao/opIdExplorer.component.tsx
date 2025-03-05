@@ -17,6 +17,13 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("All");
   const statusFilterOptions = ["all", "active", "expired", "executed"];
+  const [lastMintTime, setLastMintTime] = useState<Date>(new Date());
+  const [mintReady, setMintReady] = useState<boolean>(false);
+  const [mintCountDown, setMintCountDown] = useState<BigInt>(BigInt(0));
+
+
+  // 3 weeks + 6 days + 9 hours
+  const MintInterval = BigInt(3 * 7 * 24 * 60 * 60) + BigInt(6 * 24 * 60 * 60) + BigInt(9 * 60 * 60);
 
   useEffect(() => {
     if (window.ethereum) {
@@ -24,6 +31,35 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
       setProvider(provider);
     }
   }, []);
+
+  useEffect(() => {
+
+    const updateCountdown = () => {
+      let isReady = BigInt(Math.ceil(new Date().getTime() / 1000)) - BigInt(Math.ceil(lastMintTime.getTime() / 1000)) > MintInterval; 
+      setMintReady(isReady);
+      if (!isReady) {
+        let countdown = MintInterval - (BigInt(Math.ceil(new Date().getTime() / 1000)) - BigInt(Math.ceil(lastMintTime.getTime() / 1000)));
+        setMintCountDown(countdown);
+      }
+    };
+    updateCountdown(); // Initial call
+    const interval = setInterval(updateCountdown, 1000); // Update every second
+
+    return () => clearInterval(interval);
+  }, [lastMintTime]);
+
+  useEffect(() => {
+    if (provider) {
+      const contract = new ethers.Contract(contractAddress, abi, provider);
+      contract.lastMintTime().then((_lastMintTime) => {
+        console.log(_lastMintTime);
+        setLastMintTime(new Date((Number(_lastMintTime) * 1000)));
+        
+        let isReady = BigInt(Math.ceil(new Date().getTime() / 1000)) - BigInt(Math.ceil(Number(_lastMintTime) * 1000)) > MintInterval;
+        setMintReady(isReady);
+      });
+    }
+  }, [provider]);
 
   useEffect(() => {
     if (statusFilter === "all") {
@@ -135,7 +171,7 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
         event.topics
       );
       const operation = operationEnumToString(Number(decoded[1]));
-      console.log(operation, typeFilter);
+      // console.log(operation, typeFilter);
       return operation === typeFilter;
     });
 
@@ -145,6 +181,11 @@ export default function OpIdExplorer({ events }: { events: (ethers.Log | ethers.
 
   return (
     <div className={styles.opIdExplorerContainer}>
+      <div className={styles.MintReadiness}>
+        <div style={{color: mintReady ? "green" : "red"}}>
+          { "Last Mint: " + lastMintTime.toLocaleString()  } - {mintReady ? "Ready" : "Not Ready"} : { mintReady ? "": formatCountdown(mintCountDown) } 
+        </div>
+      </div>
       <div className={styles.bufferZone}></div>
       <div className={styles.filters}>
         {
@@ -260,3 +301,21 @@ enum OperationFilterOptions {
   UpdateSigner = 7,
   Distribute = 8,
 }
+  // Format countdown nicely
+function formatCountdown(secondsBigInt: BigInt) {
+  const seconds = Number(secondsBigInt); // Convert BigInt to Number
+  const days = Math.floor(seconds / (24 * 60 * 60));
+  const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
+  const minutes = Math.floor((seconds % (60 * 60)) / 60);
+  const secs = seconds % 60;
+
+  return new Intl.ListFormat("en", { style: "long", type: "conjunction" }).format(
+    [
+      days > 0 ? `${days} days` : null,
+      hours > 0 ? `${hours} hours` : null,
+      minutes > 0 ? `${minutes} minutes` : null,
+      secs > 0 ? `${secs} seconds` : null,
+    ].filter(Boolean)
+  );
+}
+
